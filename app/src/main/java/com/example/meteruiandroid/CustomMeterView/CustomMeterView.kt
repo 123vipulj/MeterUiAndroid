@@ -1,19 +1,22 @@
 package com.example.meteruiandroid.CustomMeterView
 
+import android.R.attr.data
 import android.animation.ValueAnimator
 import android.content.Context
-import android.database.MatrixCursor
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
+import kotlin.math.cos
+import kotlin.math.sin
+
 
 class CustomMeterView(context: Context?, attrs: AttributeSet?) : View(context, attrs), ValueAnimator.AnimatorUpdateListener{
     var arcPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     var anglePinPain = Paint(Paint.ANTI_ALIAS_FLAG)
     var textKmPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     var rectBackPain = Paint(Paint.ANTI_ALIAS_FLAG)
+    var textNumberPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     var meterTxtTitle : String = ""
     var trainglePinPath = Path()
@@ -22,7 +25,7 @@ class CustomMeterView(context: Context?, attrs: AttributeSet?) : View(context, a
 
     var pinAngleView : PinAngleView = PinAngleView()
 
-    var mPadding = 16f
+    var mPadding = 100f
     var mSection  = 30
     var mFullArcSliceLength = 360 / mSection
     var mArcSectionGap = mFullArcSliceLength / 2
@@ -40,12 +43,27 @@ class CustomMeterView(context: Context?, attrs: AttributeSet?) : View(context, a
         arcPaint.color = Color.BLACK
         arcPaint.style = Paint.Style.STROKE
         arcPaint.strokeWidth = 10f
+        arcPaint.textSize = 45f
 
-        var rectF = RectF(mPadding,mPadding, width -  mPadding, width -  mPadding)
+        textNumberPaint.color = Color.BLACK
+        textNumberPaint.textSize = 25f
+
+        var rectF = RectF(mPadding, mPadding, width - mPadding, width - mPadding)
+
 
         for (i in 0..mSection){
-            canvas?.drawArc(rectF, (180 +  (i * 6f)),
-                1f, false , arcPaint)
+            val angle = Math.PI / 30 *((270 + i))
+
+            canvas?.drawArc(
+                rectF, (180 + (i * 6f)),
+                1.5f, false, arcPaint
+            )
+
+            if(i % 3 == 0){
+                canvas?.drawText(i.toString() + "KM",(width / 2 - 10) + (width/3 * cos(angle)).toFloat(),
+                    width / 2 + (width/3 * sin(angle)).toFloat(), textNumberPaint)
+            }
+
         }
 
     }
@@ -56,8 +74,9 @@ class CustomMeterView(context: Context?, attrs: AttributeSet?) : View(context, a
         textKmPaint.color = Color.CYAN
         textKmPaint.typeface = digitalFontType
         rectBackPain.alpha = 35
-        textKmPaint.textSize = 55f
-        canvas?.drawText(meterTxtTitle, width - width /3f, width /3f, textKmPaint)
+        textKmPaint.textAlign = Paint.Align.CENTER
+        textKmPaint.textSize = 30f
+        canvas?.drawText(meterTxtTitle, width / 2f, width / 3f, textKmPaint)
     }
 
     fun drawRectForTextField(canvas: Canvas?){
@@ -66,7 +85,13 @@ class CustomMeterView(context: Context?, attrs: AttributeSet?) : View(context, a
         rectBackPain.color = Color.DKGRAY
         rectBackPain.alpha = 200
         rectBackPain.strokeJoin = Paint.Join.ROUND
-        canvas?.drawRect(width - width /3f - 5, width / 3f - 50, width - width / 3f + 160, width / 3f+ 20, rectBackPain)
+        canvas?.drawRect(
+            width / 2f - 60,
+            width / 3f - 25,
+            width / 2f + 60,
+            width / 3f + 15,
+            rectBackPain
+        )
     }
 
     override fun onAnimationUpdate(animation: ValueAnimator?) {
@@ -83,7 +108,7 @@ class CustomMeterView(context: Context?, attrs: AttributeSet?) : View(context, a
         mAnimator.start()
     }
 
-    fun updatedDegreeValue(degree : Float){
+    fun updatedDegreeValue(degree: Float){
         pinAngleView.updateDegreeRotated(degree)
         postInvalidateOnAnimation()
     }

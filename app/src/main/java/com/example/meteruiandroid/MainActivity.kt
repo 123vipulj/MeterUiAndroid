@@ -14,12 +14,12 @@ class MainActivity : AppCompatActivity() {
     lateinit var customMeterView : CustomMeterView
     private val updateTask = object : Runnable{
         override fun run() {
-            firstValue = (270..350).random()
+            firstValue = (270..450).random()
             customMeterView.startAnim(lastValue, firstValue)
-            customMeterView.updateTextTitle("$firstValue KM")
+            customMeterView.updateTextTitle("$firstValue KM/HR")
             // customMeterView.updatedDegreeValue(firstValue.toFloat())
             lastValue = firstValue
-            mainHandler.postDelayed(this, 700)
+            mainHandler.postDelayed(this, 1000)
         }
     }
 
