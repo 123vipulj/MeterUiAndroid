@@ -5,19 +5,33 @@ import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import com.example.meteruiandroid.CustomMeterView.CustomMeterView
+import com.example.meteruiandroid.CustomProgressBar.CustomProgressArc
 
 
 class MainActivity : AppCompatActivity() {
     var firstValue : Int = 0
     var lastValue : Int = 270
+
     lateinit var mainHandler: Handler
+
     lateinit var customMeterView : CustomMeterView
+    lateinit var customProgressArc: CustomProgressArc
+
     private val updateTask = object : Runnable{
         override fun run() {
             firstValue = (270..450).random()
             customMeterView.startAnim(lastValue, firstValue)
             customMeterView.updateTextTitle("$firstValue KM/HR")
             // customMeterView.updatedDegreeValue(firstValue.toFloat())
+            lastValue = firstValue
+            mainHandler.postDelayed(this, 1000)
+        }
+    }
+
+    private val updateAngle = object : Runnable{
+        override fun run() {
+            firstValue = (0..180).random()
+            customProgressArc.startAnim(lastValue, firstValue)
             lastValue = firstValue
             mainHandler.postDelayed(this, 1000)
         }
@@ -43,13 +57,18 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         customMeterView = findViewById<CustomMeterView>(R.id.customViewMeter)
+        customProgressArc = findViewById(R.id.customProgressArc)
 
         mainHandler = Handler(Looper.getMainLooper())
 
-        mainHandler.postDelayed(updateTask, 700)
+        mainHandler.postDelayed(updateAngle, 700)
 
        customMeterView.setOnClickListener {
            mainHandler.removeCallbacks(updateTask)
        }
+
+        customProgressArc.setOnClickListener {
+            mainHandler.removeCallbacks(updateAngle)
+        }
     }
 }
